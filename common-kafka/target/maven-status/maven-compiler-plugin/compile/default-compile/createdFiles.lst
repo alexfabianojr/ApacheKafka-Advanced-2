@@ -1,5 +1,8 @@
-br\com\alura\ecommerce\ConsumerFunction.class
-br\com\alura\ecommerce\KafkaDispatcher.class
-br\com\alura\ecommerce\KafkaService.class
-br\com\alura\ecommerce\GsonSerializer.class
-br\com\alura\ecommerce\GsonDeserializer.class
+br/com/alura/ecommerce/consumer/GsonDeserializer.class
+br/com/alura/ecommerce/consumer/ConsumerFunction.class
+br/com/alura/ecommerce/MessageAdapter.class
+br/com/alura/ecommerce/Message.class
+br/com/alura/ecommerce/dispatcher/KafkaDispatcher.class
+br/com/alura/ecommerce/consumer/KafkaService.class
+br/com/alura/ecommerce/dispatcher/GsonSerializer.class
+br/com/alura/ecommerce/CorrelationId.class

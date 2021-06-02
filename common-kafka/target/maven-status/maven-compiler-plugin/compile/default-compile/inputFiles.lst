@@ -1,5 +1,8 @@
-C:\CODE\ecommerce\common-kafka\src\main\java\br\com\alura\ecommerce\GsonDeserializer.java
-C:\CODE\ecommerce\common-kafka\src\main\java\br\com\alura\ecommerce\KafkaDispatcher.java
-C:\CODE\ecommerce\common-kafka\src\main\java\br\com\alura\ecommerce\ConsumerFunction.java
-C:\CODE\ecommerce\common-kafka\src\main\java\br\com\alura\ecommerce\GsonSerializer.java
-C:\CODE\ecommerce\common-kafka\src\main\java\br\com\alura\ecommerce\KafkaService.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/consumer/GsonDeserializer.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/MessageAdapter.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/Message.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/CorrelationId.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/consumer/KafkaService.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/dispatcher/KafkaDispatcher.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/consumer/ConsumerFunction.java
+/home/dell/dev/back/ApacheKafka-IntermediateCourse/common-kafka/src/main/java/br/com/alura/ecommerce/dispatcher/GsonSerializer.java
