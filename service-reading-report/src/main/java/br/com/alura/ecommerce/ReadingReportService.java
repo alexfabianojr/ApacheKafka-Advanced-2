@@ -1,6 +1,8 @@
 package br.com.alura.ecommerce;
 
+import br.com.alura.ecommerce.consumer.ConsumerService;
 import br.com.alura.ecommerce.consumer.KafkaService;
+import br.com.alura.ecommerce.consumer.ServiceRunner;
 import br.com.alura.ecommerce.dispatcher.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
@@ -10,23 +12,18 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class ReadingReportService {
+public class ReadingReportService implements ConsumerService<User> {
 
     private static final Path SOURCE = new File("src/main/resources/report.txt").toPath();
 
     private final KafkaDispatcher<User> orderDispatcher = new KafkaDispatcher<>();
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        var reportService = new ReadingReportService();
-        try (var service = new KafkaService<>(ReadingReportService.class.getSimpleName(),
-                "ECOMMERCE_USER_GENERATE_READING_REPORT",
-                reportService::parse,
-                Map.of())) {
-            service.run();
-        }
+        new ServiceRunner(ReadingReportService::new).start(5);
     }
 
-    private void parse(ConsumerRecord<String, Message<User>> record) throws ExecutionException, InterruptedException, IOException {
+    @Override
+    public void parse(ConsumerRecord<String, Message<User>> record) throws Exception {
         System.out.println("------------------------------------------");
         System.out.println("Processing report for " + record.value());
         System.out.println(record.key());
@@ -41,5 +38,15 @@ public class ReadingReportService {
         IO.append(target, "Created for " + user.getUuid());
 
         System.out.println("File Created: " + target.getAbsolutePath());
+    }
+
+    @Override
+    public String getTopic() {
+        return "ECOMMERCE_USER_GENERATE_READING_REPORT";
+    }
+
+    @Override
+    public String getConsumerGroup() {
+        return ReadingReportService.class.getSimpleName();
     }
 }

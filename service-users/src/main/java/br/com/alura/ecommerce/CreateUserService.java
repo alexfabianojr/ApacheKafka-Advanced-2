@@ -1,41 +1,32 @@
 package br.com.alura.ecommerce;
 
+import br.com.alura.LocalDatabase;
+import br.com.alura.ecommerce.consumer.ConsumerService;
 import br.com.alura.ecommerce.consumer.KafkaService;
+import br.com.alura.ecommerce.consumer.ServiceRunner;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-public class CreateUserService {
+public class CreateUserService implements ConsumerService<Order> {
 
-    private final Connection connection;
+    private final LocalDatabase database;
 
     CreateUserService() throws SQLException {
-        var url = "jdbc:sqlite:users_database.db";
-        this.connection = DriverManager.getConnection(url);
-        try {
-            this.connection.createStatement().execute(createUserQuery());
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
+        this.database = new LocalDatabase("users_database");
+        this.database.createIfNotExists(createUsersTable());
     }
 
     public static void main(String[] args) throws SQLException, ExecutionException, InterruptedException {
-        var createUserService = new CreateUserService();
-        try (var service = new KafkaService<>(CreateUserService.class.getSimpleName(),
-                "ECOMMERCE_NEW_ORDER",
-                createUserService::parse,
-                Map.of())) {
-            service.run();
-        }
+        new ServiceRunner(CreateUserService::new).start(1);
     }
 
-    private void parse(ConsumerRecord<String, Message<Order>> record) throws SQLException {
+    @Override
+    public void parse(ConsumerRecord<String, Message<Order>> record) throws SQLException {
         System.out.println("------------------------------------------");
         System.out.println("Processing user, checking if is new");
         System.out.println(record.key());
@@ -51,56 +42,44 @@ public class CreateUserService {
         insertNewUser(order.getPayload().getEmail());
     }
 
+    @Override
+    public String getTopic() {
+        return "ECOMMERCE_NEW_ORDER";
+    }
+
+    @Override
+    public String getConsumerGroup() {
+        return CreateUserService.class.getSimpleName();
+    }
+
     private void insertNewUser(String email) throws SQLException {
-
-        StringBuilder query = new StringBuilder();
-
+        var query = new StringBuilder();
         query.append("  INSERT INTO                 ");
         query.append("      USERS   (uuid, email)   ");
         query.append("  VALUES                      ");
         query.append("      (?, ?)                  ");
-
-        var insert = this.connection.prepareStatement(query.toString());
-
         var uuid = UUID.randomUUID().toString();
-
-        insert.setString(1, uuid);
-        insert.setString(2, email);
-
-        insert.execute();
-
+        this.database.update(query.toString(), uuid, email);
         System.out.printf("\nUsuário inserido com sucesso! email: %s, uuid: %s \n", email, uuid);
     }
 
     private boolean isNewUser(String email) throws SQLException {
-
         StringBuilder query = new StringBuilder();
-
         query.append("  SELECT                  ");
         query.append("      u.uuid              ");
         query.append("  FROM                    ");
         query.append("      USERS u             ");
         query.append("  WHERE                   ");
         query.append("      u.email = ? limit 1 ");
-
-        var existsUser = connection.prepareStatement(query.toString());
-
-        existsUser.setString(1, email);
-
-        var uuidConsulted = Optional.ofNullable(existsUser.executeQuery());
-
-        return !uuidConsulted.isPresent();
+        var results = this.database.query(query.toString(), email);
+        return !results.first();
     }
 
-    public static final String createUserQuery() {
-
+    public static final String createUsersTable() {
         StringBuilder query = new StringBuilder();
-
         query.append("  CREATE TABLE USERS (                ");
         query.append("      uuid varchar(255) primary key,  ");
         query.append("      email varchar(200))             ");
-
         return query.toString();
     }
-
 }

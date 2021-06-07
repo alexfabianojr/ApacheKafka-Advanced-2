@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static br.com.alura.ecommerce.CreateUserService.createUserQuery;
+import static br.com.alura.ecommerce.CreateUserService.createUsersTable;
 
 public class BatchSendMessageService {
 
@@ -24,7 +24,7 @@ public class BatchSendMessageService {
         var url = "jdbc:sqlite:users_database.db";
         this.connection = DriverManager.getConnection(url);
         try {
-            this.connection.createStatement().execute(createUserQuery());
+            this.connection.createStatement().execute(createUsersTable());
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
